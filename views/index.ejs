@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- CSS only -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi"
+      crossorigin="anonymous"
+    />
+    <title>URL Shortener</title>
+  </head>
+  <body>
+    <div class="container">
+      <h1>URL Shortener</h1>
+      <form action="/short-that-url" method="post">
+        <label for="fullURL" class="sr-only">URL</label>
+        <input
+          type="url"
+          name="fullURL"
+          id="fullURL"
+          placeholder="URL..."
+          required
+        />
+        <button type="submit">Shrink</button>
+      </form>
+
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Full URL</th>
+            <th>Short URL</th>
+            <th>CLicks</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% allShortURL.forEach(data =>{ %>
+          <tr>
+            <td>
+              <a href="<%= data.fullURL %>"><%= data.fullURL %></a>
+            </td>
+            <td>
+              <a href="<%= data.shortURL %>"><%= data.shortURL %></a>
+            </td>
+            <td><%= data.clicks %></td>
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </body>
+</html>
