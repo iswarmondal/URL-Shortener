@@ -11,21 +11,23 @@
       integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi"
       crossorigin="anonymous"
     />
+    <link rel="stylesheet" href="../public/style.css" />
     <title>URL Shortener</title>
   </head>
   <body>
     <div class="container">
-      <h1>URL Shortener</h1>
-      <form action="/short-that-url" method="post">
-        <label for="fullURL" class="sr-only">URL</label>
+      <h1 class="heading-lg">URL Shortener</h1>
+      <form action="/short-that-url" method="post" id="url-form">
+        <label for="fullURL" class="input-label">URL</label>
         <input
           type="url"
           name="fullURL"
           id="fullURL"
           placeholder="URL..."
           required
+          class="url-input"
         />
-        <button type="submit">Shrink</button>
+        <button type="submit" class="submit-btn">~>shorten<~</button>
       </form>
 
       <table class="table">
@@ -52,4 +54,5 @@
       </table>
     </div>
   </body>
+  <script src="../public/script.js"></script>
 </html>

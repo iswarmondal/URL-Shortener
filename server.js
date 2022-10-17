@@ -6,6 +6,7 @@ const Schema = require('./models/shortURL');
 mongoose.connect('mongodb://localhost:27017/urlShortener');
 
 app.set('view engine', 'ejs');
+app.use("/public", express.static(__dirname + '/public'));
 app.use(express.urlencoded({extended: true}));
 
 const PORT = process.env.PORT || 4000;

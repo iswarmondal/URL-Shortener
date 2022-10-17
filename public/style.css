@@ -1,0 +1,52 @@
+.heading-lg{
+    font-weight: 500;
+    margin-top: 5vh;
+    margin-bottom: 5vh;
+}
+.input-label{
+    display: none;
+}
+.url-input{
+    width: 65%;
+    padding: 5px 25px;
+    margin-bottom: 5vh;
+    border-radius: 5px;
+    border: solid 4px #333;
+    overflow: hidden;
+}
+.submit-btn{
+    width: 10%;
+    margin-left: 3px;
+    padding: 5px;
+    border: solid 4px #333;
+    border-radius: 5px;
+    background: #000;
+    color: yellow;
+    font-weight: normal;
+    overflow: hidden;
+}
+.shrink-animation-input{
+    animation: 1s ease-in-out forwards shrinkItInput ;
+}
+.shrink-animation-btn{
+    animation: 1s ease-in-out forwards shrinkItBtn ;
+}
+
+/* Keyframes */
+@keyframes shrinkItInput {
+    from{
+        width: 65%;
+    }
+    to{
+        width: 0px;
+    }
+}
+
+@keyframes shrinkItBtn {
+    from{
+        width: 10%;
+    }
+    to{
+        width: 0px;
+    }
+}
