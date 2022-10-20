@@ -1,7 +1,9 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const app = express();
-const Schema = require('./models/shortURL');
+const ShortURL = require('./models/shortURL');
+const bcrypt = require('bcrypt');
+const User = require('./models/User');
 
 mongoose.connect('mongodb://localhost:27017/urlShortener');
 
@@ -12,25 +14,46 @@ app.use(express.urlencoded({extended: true}));
 const PORT = process.env.PORT || 4000;
 
 app.get('/', async (req, res) => {
-    const allShortURL = await Schema.find();
+    const allShortURL = await ShortURL.find();
     res.render('index', {allShortURL});
 })
 
 
 app.post('/short-that-url', async (req, res) => {
     console.log(req.body);
-    await Schema.create({ fullURL: req.body.fullURL });
+    await ShortURL.create({ fullURL: req.body.fullURL });
     res.redirect('/');
 })
 
 app.get('/:shortURL', async (req, res)=>{
-    const shortURL = await Schema.findOne({shortURL: req.params.shortURL});
+    const shortURL = await ShortURL.findOne({shortURL: req.params.shortURL});
     if (shortURL == null) return res.send("404 NOT FOUND!!!").status(404);
 
     shortURL.clicks++;
     shortURL.save();
 
     res.redirect(shortURL.fullURL);
+
+})
+
+app.post('/api/user/register', async (req, res) =>{
+    console.log(req.body);
+    const {username, email, password} = req.body;
+    if(password && username && email){
+        const hash = bcrypt.hash(password);
+    
+        const user = new User({
+            username,
+            email,
+            password: hash
+        })
+        try{
+            const saveUser = await user.save();
+            res.send(saveUser);
+        }catch(err){
+            res.status(400).send({"message": err.message});
+        }
+    }
 
 })
 
