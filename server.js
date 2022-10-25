@@ -10,6 +10,7 @@ mongoose.connect('mongodb://localhost:27017/urlShortener');
 app.set('view engine', 'ejs');
 app.use("/public", express.static(__dirname + '/public'));
 app.use(express.urlencoded({extended: true}));
+app.use(express.json())
 
 const PORT = process.env.PORT || 4000;
 
@@ -36,12 +37,15 @@ app.get('/:shortURL', async (req, res)=>{
 
 })
 
+app.get('/user/reg', (req, res) => {
+    res.render('register')
+})
+
 app.post('/api/user/register', async (req, res) =>{
-    console.log(req.body);
-    const {username, email, password} = req.body;
-    if(password && username && email){
-        const hash = bcrypt.hash(password);
-    
+    const {username, password, email} = req.body;
+    if(password && username ){
+        const hash = await bcrypt.hash(`${password}`, 10); // converted password into a string
+
         const user = new User({
             username,
             email,
@@ -49,7 +53,7 @@ app.post('/api/user/register', async (req, res) =>{
         })
         try{
             const saveUser = await user.save();
-            res.send(saveUser);
+            res.status(200).send(saveUser);
         }catch(err){
             res.status(400).send({"message": err.message});
         }

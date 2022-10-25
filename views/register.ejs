@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous" />
+    <link rel="stylesheet" href="../public/style.css" />
+    <title>URL Shortener</title>
+</head>
+
+<body>
+    <div class="container">
+        <h1 class="container-sm mb-4 mt-2">Register</h1>
+        <h4 class="text-warning container-sm" id="errorMsg"></h4>
+        <div class="container-sm d-flex flex-column" >
+            <input type="text" name="username" required placeholder="Username ?.." id="username" class="m-2 p-2"
+                onchange="checkUsername()" onkeydown="checkUsername()">
+            <input type="password" name="password" required placeholder="Password ?.." class="m-2 p-2" id="password">
+            <input type="password" placeholder="Conform Password.." required class="m-2 p-2" id="cpassword">
+            <button class="m-2 p-2 btn btn-success" onclick="handleSubmit()">Register</button>
+        </div>
+    </div>
+</body>
+<script>
+
+    const checkUsername = () => {
+        console.log("checked");
+    }
+
+
+    function handleSubmit () {
+        const username = document.getElementById("username").value;
+        const password = document.getElementById("password").value;
+        const cpassword = document.getElementById("cpassword").value;
+
+        if (username !== null && password !== null && password === cpassword) {
+            const userData = { username, password };
+            console.log(userData);
+            fetch("/api/user/register", {
+                method: "POST",
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(userData)
+            }).then(res => console.log(res))
+        }else{
+            const errorMessage = "Password and confirm password not matching";
+            const node = document.getElementById("errorMsg");
+
+            node.innerText = errorMessage;
+        }
+
+    }
+
+</script>
+
+</html>
