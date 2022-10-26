@@ -68,6 +68,17 @@ app.post('/api/user/register', async (req, res) =>{
 
 })
 
+app.post("/api/user/check-username", async (req, res) => {
+    const {username} = req.body;
+    const isExsist = await User.findOne({username});
+    
+    if(isExsist === null || isExsist === undefined) {
+        res.status(200).json({"success": true, "message":"Username is not been used by someone else"});
+    }else{
+        res.status(200).json({"success": false, "message":"Error: Username already exists"});
+    }
+})
+
 app.get("/user/login", (req, res)=>{
     res.render("login")
 })
