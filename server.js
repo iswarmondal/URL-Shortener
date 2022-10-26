@@ -4,6 +4,9 @@ const app = express();
 const ShortURL = require('./models/shortURL');
 const bcrypt = require('bcrypt');
 const User = require('./models/User');
+const jwt = require('jsonwebtoken');
+const auth = require('./middlewares/auth');
+require('dotenv').config()
 
 mongoose.connect('mongodb://localhost:27017/urlShortener');
 
@@ -37,7 +40,11 @@ app.get('/:shortURL', async (req, res)=>{
 
 })
 
-app.get('/user/reg', (req, res) => {
+app.get("/user/urls", auth, (req, res) => {
+    res.status(200).json(req.user);
+})
+
+app.get('/user/register', (req, res) => {
     res.render('register')
 })
 
@@ -59,6 +66,28 @@ app.post('/api/user/register', async (req, res) =>{
         }
     }
 
+})
+
+app.get("/user/login", (req, res)=>{
+    res.render("login")
+})
+
+app.post("/api/user/login", async (req, res)=>{
+    const {username, password} = req.body;
+    if(password != undefined && username){
+        const user = await User.findOne({username});
+        const isVarified = await bcrypt.compare(`${password}`, user.password);
+
+        if(isVarified){
+            const token = jwt.sign({ _id: user._id }, process.env.AUTH_TOKEN_SECTRET);
+            res.status(200).json({authToken: token});
+        }else{
+            res.status(403).send("login failed");
+        }
+
+    }else{
+        res.status(403).send("Login failed");
+    }
 })
 
 app.listen(PORT, ()=>console.log(`listening on port ${PORT}`));
