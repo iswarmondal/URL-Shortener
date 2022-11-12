@@ -29,11 +29,16 @@ app.get('/get-all-urls', async (req, res) => {
     res.status(200).json({success: true, message:"Successfully retrieved all URLs.", data: allShortURL});
 })
 
+app.get('/get-user-all-urls', async (req, res) => {
+    const allShortURL = await ShortURL.find();
+    res.status(200).json({success: true, message:"Successfully retrieved all URLs.", data: allShortURL});
+})
 
-app.post('/short-that-url', async (req, res) => {
-    console.log(req.body);
-    await ShortURL.create({ fullURL: req.body.fullURL });
-    // res.redirect('/');
+
+app.post('/short-that-url', auth, async (req, res) => {
+    if (token === undefined) return res.status(500).json({success: false, message: "Unable to authinticate user"})
+
+    await ShortURL.create({ fullURL: req.body.fullURL,  });
     res.status(200).json({success: true, message: "URL created successfully", error: false});
 })
 
@@ -101,13 +106,13 @@ app.post("/api/user/login", async (req, res)=>{
 
         if(isVarified){
             const token = jwt.sign({ _id: user._id }, process.env.AUTH_TOKEN_SECTRET);
-            res.status(200).json({authToken: token});
+            res.status(200).json({success: true, authToken: token});
         }else{
-            res.status(403).send("login failed");
+            res.status(403).json({success: false, message: "Unable to login the user"});
         }
 
     }else{
-        res.status(403).send("Login failed");
+        res.status(403).json({success: false, message: "Unable to login the user !"});
     }
 })
 
