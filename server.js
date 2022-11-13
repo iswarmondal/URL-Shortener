@@ -24,8 +24,9 @@ app.get('/', async (req, res) => {
     res.render('index', {allShortURL});
 })
 
-app.get('/get-all-urls', async (req, res) => {
-    const allShortURL = await ShortURL.find();
+app.get('/get-all-urls', auth, async (req, res) => {
+    console.log(req.user._id)
+    const allShortURL = await ShortURL.find({ owner: req.user._id });
     res.status(200).json({success: true, message:"Successfully retrieved all URLs.", data: allShortURL});
 })
 
@@ -36,9 +37,8 @@ app.get('/get-user-all-urls', async (req, res) => {
 
 
 app.post('/short-that-url', auth, async (req, res) => {
-    if (token === undefined) return res.status(500).json({success: false, message: "Unable to authinticate user"})
-
-    await ShortURL.create({ fullURL: req.body.fullURL,  });
+    const owner = req.user._id;
+    await ShortURL.create({ fullURL: req.body.fullURL, owner  });
     res.status(200).json({success: true, message: "URL created successfully", error: false});
 })
 
@@ -114,6 +114,10 @@ app.post("/api/user/login", async (req, res)=>{
     }else{
         res.status(403).json({success: false, message: "Unable to login the user !"});
     }
+})
+
+app.get("/api/user/varify-user", auth, (req, res)=>{
+    res.status(201).json({success: true, message: "User varified"});
 })
 
 app.listen(PORT, ()=>console.log(`listening on port ${PORT}`));
