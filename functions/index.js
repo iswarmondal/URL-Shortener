@@ -10,6 +10,7 @@ const jwt = require("jsonwebtoken");
 const auth = require("./middleware/auth");
 require("dotenv").config();
 const cors = require("cors");
+const shortid = require("shortid");
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -76,7 +77,7 @@ app.post("/login", async (req, res)=>{
 
     if (isVerified) {
       const token = jwt.sign({ _id:  userId}, process.env.AUTH_TOKEN_SECRET);
-      res.status(200).json({ success: true, authToken: token });
+      res.status(200).json({ success: true, authToken: `Barer ${token}` });
     } else {
       // IF NOT VERIFIED
       res.status(403).json({ success: false, message: "Unable to login the user" });
@@ -92,8 +93,34 @@ app.post("/login", async (req, res)=>{
 app.post('/short-that-url', auth, async (req, res) => {
   const owner = req.user._id;
   
-  await ShortURL.create({ fullURL: req.body.fullURL, owner });
-  res.status(200).json({ success: true, message: "URL created successfully", error: false });
+  if (req.body.fullURL !== undefined && req.body.fullURL !== null) {
+
+    // IF THE USER DOES NOT EXIST
+    let document = await db.collection("users").doc(`${owner}`).get();
+    if (!(document.exists)) {
+      res.json({ success: false, message: "The user not found" });
+      return;
+    }
+
+    const urlString = `${req.body.fullURL}`;
+    
+    const data = {
+      fullURL: urlString,
+      shortURL: shortid.generate(),
+      owner,
+      dateOfCreation: new Date().getTime(),
+      analytics:{}
+    };
+    try {
+      const result = await db.collection("urls").add(data);
+      res.status(200).json({ success: true, message: "New url added", id: result.id, owner })
+    } catch (err) {
+      res.status(400).send({ "message": err.message });
+    }
+  } else {
+    // ANY PROBLEM WITH REQUEST BODY
+    res.json({ success: false, message: "Problem with your URL" });
+  }
 })
 
 exports.api = functions.https.onRequest(app);
