@@ -1,6 +1,5 @@
 const functions = require("firebase-functions");
 const db  = require("./firestore");
-// const { collection } = require('firebase/firestore');
 const express = require("express");
 const app = express();
 const ShortURL = require("../models/shortURL");
@@ -11,6 +10,7 @@ const auth = require("./middleware/auth");
 require("dotenv").config();
 const cors = require("cors");
 const shortid = require("shortid");
+const {FieldValue} = require("firebase-admin/firestore")
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -109,7 +109,9 @@ app.post('/short-that-url', auth, async (req, res) => {
       shortURL: shortid.generate(),
       owner,
       dateOfCreation: new Date().getTime(),
-      analytics:{}
+      analytics:{
+        totalClicks: 0
+      }
     };
     try {
       const result = await db.collection("urls").add(data);
@@ -120,6 +122,29 @@ app.post('/short-that-url', auth, async (req, res) => {
   } else {
     // ANY PROBLEM WITH REQUEST BODY
     res.json({ success: false, message: "Problem with your URL" });
+  }
+})
+
+// === FORWARDING ===
+app.get("/go/:shortURL", async (req, res)=>{
+  const shortURL = req.params.shortURL;
+  const snapshot = await db.collection("urls").where("shortURL", "==", shortURL).get();
+  if(snapshot.empty){
+    res.status(404).json({success: false, message: "No URL found"});
+    return;
+  }else{
+    var data;
+    snapshot.forEach(doc=>{
+      data = doc.data();
+      data.id = doc.id;
+    })
+    let fullURL = data.fullURL;
+    let analytics = data.analytics;
+    
+    await db.collection("urls").doc(data.id).update({
+      "analytics.totalClicks": FieldValue.increment(1)
+    })
+    res.redirect(fullURL);
   }
 })
 
